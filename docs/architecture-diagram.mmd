@@ -1,0 +1,53 @@
+graph TD
+    subgraph ClientLayer["Frontend Client Layer (Browser)"]
+        UI["React 18 + Vite SPA"]
+        STT["Web Speech Recognition (STT)"]
+        TTS["Web SpeechSynthesis (TTS)"]
+        State["Session State & Transcript Cache"]
+    end
+
+    subgraph GatewayLayer["Backend API Gateway (Express.js)"]
+        Limiter["Express Rate Limiter (120 req/min)"]
+        Router["Express REST Endpoints"]
+        Auth["CORS & Request Sanitization"]
+    end
+
+    subgraph LogicLayer["Business & AI Engine"]
+        AgentEngine["Agent Orchestrator"]
+        LLM["OpenAI API (gpt-4o-mini)"]
+        DemoEngine["Deterministic Scripted Fallback"]
+        RAG["BM25 / Keyword RAG Engine"]
+        Qualifier["BANT Lead Scoring (0-100)"]
+        Scheduler["Collision-Free Appointment Engine"]
+    end
+
+    subgraph DataLayer["Persistence Layer (SQLite3 WAL)"]
+        KBTable[("knowledge_base")]
+        LeadsTable[("leads")]
+        AptTable[("appointments")]
+        CallsTable[("call_logs")]
+    end
+
+    %% Flows
+    UI -->|Voice Audio| STT
+    STT -->|Transcribed Text| UI
+    UI -->|REST / JSON| Limiter
+    Limiter --> Auth
+    Auth --> Router
+
+    Router -->|Process Message| AgentEngine
+    AgentEngine -->|Lookup Context| RAG
+    RAG -->|Query Match| KBTable
+    
+    AgentEngine -->|Live Query| LLM
+    AgentEngine -.->|Fallback / Demo| DemoEngine
+    AgentEngine -->|Extract & Score| Qualifier
+    
+    Qualifier -->|Write Lead| LeadsTable
+    Router -->|Book Appointment| Scheduler
+    Scheduler -->|Slot Validation| AptTable
+    Router -->|Save Summary| CallsTable
+
+    AgentEngine -->|Response Text| Router
+    Router -->|JSON Reply| UI
+    UI -->|Audio Utterance| TTS

@@ -1,0 +1,22 @@
+{
+  "name": "fortivoice-ai-sales-agent",
+  "version": "1.0.0",
+  "description": "FortiVoice AI — Autonomous AI Sales Voice Agent",
+  "main": "server/index.js",
+  "scripts": {
+    "server": "node server/index.js",
+    "client": "npm run dev --prefix client",
+    "dev": "concurrently \"npm run server\" \"npm run client\"",
+    "build": "npm run build --prefix client"
+  },
+  "dependencies": {
+    "better-sqlite3": "^11.8.1",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "express-rate-limit": "^7.5.0"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.2"
+  }
+}
